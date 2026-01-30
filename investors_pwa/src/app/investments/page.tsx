@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, ClipboardList, Repeat } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
+import { IconWrapper } from '@/components/ui/IconWrapper';
 import { formatCurrency, formatPercent } from '@/lib/utils';
 
 type Tab = 'portfolio' | 'sips' | 'orders';
@@ -86,7 +86,7 @@ export default function InvestmentsPage() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-center gap-8 mb-6">
+      <div className="flex items-center gap-8 -mx-4 px-4 py-3 mb-6 bg-[#262626] border-b border-[#333333]">
         {(['portfolio', 'sips', 'orders'] as const).map((tab) => (
           <button
             key={tab}
@@ -98,7 +98,7 @@ export default function InvestmentsPage() {
               setActiveTab(tab);
             }}
             className={`pb-2 font-medium capitalize transition-colors ${
-              activeTab === tab ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-400'
+              activeTab === tab ? 'text-white border-b-2 border-blue-500' : 'text-[#9B9B9B] hover:text-gray-400'
             }`}
           >
             {tab === 'sips' ? 'SIPs' : tab}
@@ -142,23 +142,33 @@ function EmptyState({ tab }: { tab: Tab }) {
 function PortfolioList({ holdings }: { holdings: PortfolioHolding[] }) {
   return (
     <>
-      {holdings.map((item) => (
-        <Card key={item.id}>
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-medium">{item.fund.name}</h3>
-              <p className="text-sm text-gray-500">
-                {item.quantity} units @ {formatCurrency(item.avgBuyPrice)}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">{formatCurrency(item.currentValue)}</p>
-              <p className={`text-sm ${Number.parseFloat(item.pnl) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {formatCurrency(item.pnl)} ({formatPercent(Number.parseFloat(item.pnlPercent))})
-              </p>
-            </div>
+      {holdings.map((item, index) => (
+        <div
+          key={item.id}
+          className={`flex items-center gap-4 bg-[#262626] px-5 py-4 rounded-sm ${
+            index !== holdings.length - 1 ? 'border-b border-[#333333]' : ''
+          }`}
+        >
+          <IconWrapper
+            icon={Briefcase}
+            size={24}
+            primaryClassName="text-blue-400"
+            secondaryClassName="text-blue-400"
+            glowClassName="bg-blue-500/10"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-[15px] font-semibold text-white truncate">{item.fund.name}</h3>
+            <p className="text-[13px] text-[#9B9B9B] leading-relaxed">
+              {item.quantity} units @ {formatCurrency(item.avgBuyPrice)}
+            </p>
           </div>
-        </Card>
+          <div className="text-right">
+            <p className="text-[15px] font-semibold text-white">{formatCurrency(item.currentValue)}</p>
+            <p className={`text-[13px] ${Number.parseFloat(item.pnl) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {formatCurrency(item.pnl)} ({formatPercent(Number.parseFloat(item.pnlPercent))})
+            </p>
+          </div>
+        </div>
       ))}
     </>
   );
@@ -180,42 +190,61 @@ function SipsList({ sips, onUpdate }: { sips: SipEntry[]; onUpdate: () => void }
 
   return (
     <>
-      {sips.map(({ sip, fund }) => (
-        <Card key={sip.id}>
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <h3 className="font-medium">{fund.name}</h3>
-              <p className="text-sm text-gray-500">
-                {formatCurrency(sip.installmentAmount)} / {sip.frequency.toLowerCase()}
-              </p>
+      {sips.map(({ sip, fund }, index) => (
+        <div
+          key={sip.id}
+          className={`flex items-center gap-4 bg-[#262626] px-5 py-4 rounded-sm ${
+            index !== sips.length - 1 ? 'border-b border-[#333333]' : ''
+          }`}
+        >
+          <IconWrapper
+            icon={Repeat}
+            size={24}
+            primaryClassName="text-emerald-400"
+            secondaryClassName="text-emerald-400"
+            glowClassName="bg-emerald-500/10"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-[15px] font-semibold text-white truncate">{fund.name}</h3>
+              <span
+                className={`text-[11px] px-2 py-1 rounded-sm ${
+                  sip.status === 'ACTIVE'
+                    ? 'bg-green-500/20 text-green-500'
+                    : sip.status === 'PAUSED'
+                      ? 'bg-yellow-500/20 text-yellow-500'
+                      : 'bg-red-500/20 text-red-500'
+                }`}
+              >
+                {sip.status}
+              </span>
             </div>
-            <span
-              className={`text-xs px-2 py-1 rounded ${
-                sip.status === 'ACTIVE'
-                  ? 'bg-green-500/20 text-green-500'
-                  : sip.status === 'PAUSED'
-                    ? 'bg-yellow-500/20 text-yellow-500'
-                    : 'bg-red-500/20 text-red-500'
-              }`}
-            >
-              {sip.status}
-            </span>
+            <p className="text-[13px] text-[#9B9B9B] leading-relaxed">
+              {formatCurrency(sip.installmentAmount)} / {sip.frequency.toLowerCase()}
+            </p>
+            <p className="text-[13px] text-[#9B9B9B] leading-relaxed">
+              Next: {sip.nextExecutionDate ? new Date(sip.nextExecutionDate).toLocaleDateString('en-IN') : '—'}
+            </p>
+            {sip.status === 'ACTIVE' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange(sip.id, 'PAUSED')}
+                className="text-[13px] text-yellow-500 mt-2"
+              >
+                Pause SIP
+              </button>
+            )}
+            {sip.status === 'PAUSED' && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange(sip.id, 'ACTIVE')}
+                className="text-[13px] text-green-500 mt-2"
+              >
+                Resume SIP
+              </button>
+            )}
           </div>
-          <p className="text-xs text-gray-500 mb-3">
-            Next:{' '}
-            {sip.nextExecutionDate ? new Date(sip.nextExecutionDate).toLocaleDateString('en-IN') : '—'}
-          </p>
-          {sip.status === 'ACTIVE' && (
-            <button type="button" onClick={() => handleStatusChange(sip.id, 'PAUSED')} className="text-sm text-yellow-500">
-              Pause SIP
-            </button>
-          )}
-          {sip.status === 'PAUSED' && (
-            <button type="button" onClick={() => handleStatusChange(sip.id, 'ACTIVE')} className="text-sm text-green-500">
-              Resume SIP
-            </button>
-          )}
-        </Card>
+        </div>
       ))}
     </>
   );
@@ -224,34 +253,48 @@ function SipsList({ sips, onUpdate }: { sips: SipEntry[]; onUpdate: () => void }
 function OrdersList({ orders }: { orders: OrderEntry[] }) {
   return (
     <>
-      {orders.map(({ order, fund }) => (
-        <Card key={order.id}>
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-medium">{fund.name}</h3>
-              <p className="text-sm text-gray-500">
-                {order.type} • {formatCurrency(order.amount)}
-              </p>
-              <p className="text-xs text-gray-600">{new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+      {orders.map(({ order, fund }, index) => (
+        <div
+          key={order.id}
+          className={`flex items-center gap-4 bg-[#262626] px-5 py-4 rounded-sm ${
+            index !== orders.length - 1 ? 'border-b border-[#333333]' : ''
+          }`}
+        >
+          <IconWrapper
+            icon={ClipboardList}
+            size={24}
+            primaryClassName="text-gray-400"
+            secondaryClassName="text-gray-400"
+            glowClassName="bg-gray-500/10"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-[15px] font-semibold text-white truncate">{fund.name}</h3>
+              <span
+                className={`text-[11px] px-2 py-1 rounded-sm ${
+                  order.status === 'COMPLETED'
+                    ? 'bg-green-500/20 text-green-500'
+                    : order.status === 'PENDING'
+                      ? 'bg-yellow-500/20 text-yellow-500'
+                      : 'bg-red-500/20 text-red-500'
+                }`}
+              >
+                {order.status}
+              </span>
             </div>
-            <span
-              className={`text-xs px-2 py-1 rounded ${
-                order.status === 'COMPLETED'
-                  ? 'bg-green-500/20 text-green-500'
-                  : order.status === 'PENDING'
-                    ? 'bg-yellow-500/20 text-yellow-500'
-                    : 'bg-red-500/20 text-red-500'
-              }`}
-            >
-              {order.status}
-            </span>
-          </div>
-          {order.greenCreditsEarned && Number.parseFloat(order.greenCreditsEarned) > 0 && (
-            <p className="text-xs text-green-500 mt-2">
-              +{formatCurrency(order.greenCreditsEarned)} Green Credits earned
+            <p className="text-[13px] text-[#9B9B9B] leading-relaxed">
+              {order.type} • {formatCurrency(order.amount)}
             </p>
-          )}
-        </Card>
+            <p className="text-[13px] text-[#9B9B9B] leading-relaxed">
+              {new Date(order.createdAt).toLocaleDateString('en-IN')}
+            </p>
+            {order.greenCreditsEarned && Number.parseFloat(order.greenCreditsEarned) > 0 && (
+              <p className="text-[13px] text-green-500 mt-2">
+                +{formatCurrency(order.greenCreditsEarned)} Green Credits earned
+              </p>
+            )}
+          </div>
+        </div>
       ))}
     </>
   );

@@ -1,16 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { Building, Building2, Leaf } from 'lucide-react';
+import { Building, Building2, TrendingUp } from 'lucide-react';
 
 import { Card } from '@/components/ui/Card';
+import { IconWrapper } from '@/components/ui/IconWrapper';
 
 const fundTypes = [
   {
     id: 'GREEN_FUND',
     name: 'Green Funds',
-    icon: Leaf,
-    iconColor: 'text-green-500',
+    icon: TrendingUp,
+    iconColor: 'text-emerald-500',
   },
   {
     id: 'GREEN_BOND',
@@ -37,7 +38,20 @@ export function FundTypeGrid() {
           <Link key={id} href={`/discover?type=${id}`}>
             <Card className="flex items-center gap-4 hover:bg-neutral-800 transition-colors">
               <div className="w-12 h-12 flex items-center justify-center">
-                <Icon className={`w-6 h-6 ${iconColor}`} />
+                <IconWrapper
+                  icon={Icon}
+                  size={24}
+                  strokeWidth={1.5}
+                  primaryClassName={iconColor}
+                  secondaryClassName={iconColor}
+                  glowClassName={
+                    id === 'GREEN_FUND'
+                      ? 'bg-emerald-500/10'
+                      : id === 'GREEN_BOND'
+                        ? 'bg-teal-400/10'
+                        : 'bg-amber-500/10'
+                  }
+                />
               </div>
               <span className="font-medium">{name}</span>
             </Card>
