@@ -599,19 +599,8 @@ function fileToDataUrl(file: File): Promise<string> {
 ### File: `src/lib/ai-agent.ts` (Updated with Enhanced Verification)
 
 ```typescript
-import { ChatOpenAI } from '@langchain/openai';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-
-// Initialize OpenRouter client
-const llm = new ChatOpenAI({
-  modelName: 'anthropic/claude-3-haiku', // Fast and cheap for verification
-  openAIApiKey: process.env.OPENROUTER_API_KEY,
-  configuration: {
-    baseURL: 'https://openrouter.ai/api/v1',
-  },
-  temperature: 0,
-  maxTokens: 500,
-});
+// OpenRouter via direct fetch (no OpenAI SDK)
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // List of valid green/renewable product categories
 const GREEN_CATEGORIES = [
@@ -680,12 +669,27 @@ export async function verifyGreenProduct(
   const userPrompt = buildUserPrompt(productName, productPrice, userCredits, invoiceText);
 
   try {
-    const response = await llm.invoke([
-      new SystemMessage(systemPrompt),
-      new HumanMessage(userPrompt),
-    ]);
+    const response = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.OPENROUTER_APP_URL || 'http://localhost:3000',
+        'X-Title': process.env.OPENROUTER_APP_NAME || 'GreenFin Investors PWA',
+      },
+      body: JSON.stringify({
+        model: process.env.OPENROUTER_MODEL || 'gpt-4o-mini',
+        temperature: 0,
+        max_tokens: 500,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      }),
+    });
 
-    const content = response.content as string;
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
 
     // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);

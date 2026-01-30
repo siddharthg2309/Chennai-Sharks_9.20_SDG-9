@@ -1,8 +1,5 @@
 import 'server-only';
 
-import { ChatOpenAI } from '@langchain/openai';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-
 interface VerificationInput {
   productName: string;
   productPrice: number;
@@ -56,27 +53,16 @@ const GREEN_CATEGORIES = [
   'charging station',
 ];
 
-let cachedLlm: ChatOpenAI | null | undefined;
-
-function getLlm() {
-  if (cachedLlm !== undefined) return cachedLlm;
+function getOpenRouterConfig() {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    cachedLlm = null;
-    return cachedLlm;
-  }
+  if (!apiKey) return null;
 
-  cachedLlm = new ChatOpenAI({
-    modelName: 'anthropic/claude-3-haiku',
-    openAIApiKey: apiKey,
-    configuration: {
-      baseURL: 'https://openrouter.ai/api/v1',
-    },
-    temperature: 0,
-    maxTokens: 500,
-  });
-
-  return cachedLlm;
+  return {
+    apiKey,
+    model: process.env.OPENROUTER_MODEL || 'gpt-4o-mini',
+    appUrl: process.env.OPENROUTER_APP_URL || 'http://localhost:3000',
+    appName: process.env.OPENROUTER_APP_NAME || 'GreenFin Investors PWA',
+  };
 }
 
 function capitalizeWords(str: string): string {
@@ -120,7 +106,7 @@ function fallbackVerification(productName: string): VerificationResult {
 }
 
 function buildSystemPrompt(hasInvoice: boolean): string {
-  const basePrompt = `You are a green product verification assistant for GreenFin. Users can redeem their Green Credits when purchasing green/eco-friendly products.
+  const basePrompt = `You are a green product verification assistant for GreeFin. Users can redeem their Green Credits when purchasing green/eco-friendly products.
 
 Your job is to decide if a claim is eligible.
 
@@ -209,9 +195,9 @@ Is this eligible? Respond with JSON only.`;
 }
 
 export async function verifyGreenProduct(input: VerificationInput): Promise<VerificationResult> {
-  const llm = getLlm();
+  const config = getOpenRouterConfig();
 
-  if (!llm) {
+  if (!config) {
     return fallbackVerification(input.productName);
   }
 
@@ -219,9 +205,34 @@ export async function verifyGreenProduct(input: VerificationInput): Promise<Veri
   const userPrompt = buildUserPrompt(input);
 
   try {
-    const response = await llm.invoke([new SystemMessage(systemPrompt), new HumanMessage(userPrompt)]);
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': config.appUrl,
+        'X-Title': config.appName,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        temperature: 0,
+        max_tokens: 500,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      }),
+    });
 
-    const content = response.content as string;
+    if (!response.ok) {
+      throw new Error(`OpenRouter request failed: ${response.status}`);
+    }
+
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+
+    const content = data.choices?.[0]?.message?.content || '';
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in response');

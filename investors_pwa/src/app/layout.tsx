@@ -7,13 +7,13 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'GreenFin - Green Investments',
+  title: 'GreeFin - Green Investments',
   description: "Invest in India's green infrastructure. Earn Green Credits on every investment.",
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'GreenFin',
+    title: 'GreeFin',
   },
   icons: {
     icon: '/icons/icon-192.png',
