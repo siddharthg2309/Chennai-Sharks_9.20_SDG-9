@@ -48,12 +48,7 @@ Packages:
 
 ⸻
 
-Auth Layer (Hackathon Fast Option)
 
-Clerk Auth (Recommended)
-    •    Instant login system
-    •    Supports role-based dashboards
-    •    Saves huge time
 PWA Layer
 
  next-pwa
