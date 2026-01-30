@@ -2,32 +2,34 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Building, Leaf, TrendingUp } from 'lucide-react';
+import { Building, Building2, TrendingUp } from 'lucide-react';
+
+import { IconWrapper } from '@/components/ui/IconWrapper';
 
 const categories = [
   {
     id: 'GREEN_FUND',
     title: 'Green Mutual Funds',
     description: 'ESG & renewable energy funds',
-    icon: Leaf,
-    iconBg: 'bg-green-500/20',
-    iconColor: 'text-green-500',
+    icon: TrendingUp,
+    iconColor: 'text-emerald-500',
+    glowColor: 'bg-emerald-500/10',
   },
   {
     id: 'GREEN_BOND',
     title: 'Green Bonds',
     description: 'Fixed return green bonds',
     icon: Building,
-    iconBg: 'bg-blue-500/20',
-    iconColor: 'text-blue-500',
+    iconColor: 'text-teal-400',
+    glowColor: 'bg-teal-400/10',
   },
   {
     id: 'INVIT',
     title: 'Green InvITs',
     description: 'Infrastructure trusts',
-    icon: TrendingUp,
-    iconBg: 'bg-purple-500/20',
-    iconColor: 'text-purple-500',
+    icon: Building2,
+    iconColor: 'text-amber-500',
+    glowColor: 'bg-amber-500/10',
   },
 ];
 
@@ -63,7 +65,7 @@ export function ExploreCarousel() {
 
   return (
     <div className="mt-6">
-      <h2 className="text-lg font-semibold mb-4">Explore investment ideas</h2>
+      <h2 className="text-lg font-semibold text-white mb-4">Explore investment ideas</h2>
 
       <div
         ref={scrollContainerRef}
@@ -73,20 +75,23 @@ export function ExploreCarousel() {
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {categories.map(({ id, title, description, icon: Icon, iconBg, iconColor }) => (
+        {categories.map(({ id, title, description, icon: Icon, iconColor, glowColor }) => (
           <Link
             key={id}
             href={`/discover?type=${id}`}
             className="snap-start flex-shrink-0"
             style={{ width: '70%' }}
           >
-            <div className="bg-neutral-900 rounded-xl p-4 h-40 flex flex-col justify-between hover:bg-neutral-800 transition-colors">
-              <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
-                <Icon className={`w-6 h-6 ${iconColor}`} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-base mb-1">{title}</h3>
-                <p className="text-sm text-gray-400">{description}</p>
+            <div className="group bg-[#262626] border border-[#333333] rounded-md p-5 h-32 flex items-center gap-4 hover:bg-[#2e2e2e] transition-colors">
+              <IconWrapper
+                icon={Icon}
+                primaryClassName={iconColor}
+                secondaryClassName={iconColor}
+                glowClassName={glowColor}
+              />
+              <div className="min-w-0">
+                <h3 className="text-white text-base font-semibold leading-tight">{title}</h3>
+                <p className="text-sm text-[#9B9B9B] leading-snug">{description}</p>
               </div>
             </div>
           </Link>

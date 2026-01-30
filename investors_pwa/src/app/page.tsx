@@ -47,7 +47,7 @@ export default async function HomePage() {
           <div className="w-10 h-10 bg-yellow-500 rounded-full" />
           <div>
             <h1 className="text-lg font-semibold">Hi {mockUser.name.split(' ')[0]}</h1>
-            <p className="text-sm text-gray-500">Welcome to GreenFin</p>
+            <p className="text-sm text-gray-500">Welcome to GreeFin</p>
           </div>
         </div>
         <Link href="/discover" className="p-2" aria-label="Search funds">
@@ -74,6 +74,11 @@ export default async function HomePage() {
           treesEquivalent={impact.treesEquivalent}
         />
       )}
+
+      <footer className="mt-10 pt-6 border-t border-[#333333] text-center text-xs text-[#9B9B9B] space-y-2">
+        <p>© 2026 GreeFin. All rights reserved.</p>
+        <p>Investments are subject to market risks. Read all scheme related documents carefully.</p>
+      </footer>
     </div>
   );
 }

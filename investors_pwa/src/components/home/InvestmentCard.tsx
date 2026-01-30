@@ -18,33 +18,33 @@ export function InvestmentCard({ totalInvested, currentValue, pnl, pnlPercent, x
   const isPositive = pnl >= 0;
 
   return (
-    <Card>
+    <Card className="bg-[#262626] border border-[#333333] rounded-md">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-gray-400 bg-neutral-800 px-3 py-1 rounded-full">Your investments</span>
-        <Link href="/investments" className="text-blue-500 text-sm flex items-center gap-1">
+        <span className="text-sm text-[#9B9B9B] bg-[#2b2b2b] px-3 py-1 rounded-md">Your investments</span>
+        <Link href="/investments" className="text-blue-400 text-sm flex items-center gap-1">
           View <RefreshCw className="w-3 h-3" />
         </Link>
       </div>
 
       <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-xs text-gray-500 mb-1">P&amp;L</p>
-          <p className={`text-2xl font-bold ${isPositive ? 'text-white' : 'text-red-500'}`}>{formatCurrency(pnl)}</p>
+          <p className="text-xs text-[#9B9B9B] mb-1">P&amp;L</p>
+          <p className={`text-2xl font-bold ${isPositive ? 'text-white' : 'text-red-400'}`}>{formatCurrency(pnl)}</p>
           <p className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>{formatPercent(pnlPercent)}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-500 mb-1">XIRR</p>
+          <p className="text-xs text-[#9B9B9B] mb-1">XIRR</p>
           <p className={`text-sm ${xirr >= 0 ? 'text-green-500' : 'text-red-500'}`}>{formatPercent(xirr)}</p>
         </div>
       </div>
 
-      <div className="flex justify-between border-t border-neutral-800 pt-4">
+      <div className="flex justify-between border-t border-[#333333] pt-4">
         <div>
-          <p className="text-xs text-gray-500">Invested</p>
+          <p className="text-xs text-[#9B9B9B]">Invested</p>
           <p className="text-lg">{formatCurrency(totalInvested)}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-500">Current</p>
+          <p className="text-xs text-[#9B9B9B]">Current</p>
           <p className="text-lg">{formatCurrency(currentValue)}</p>
         </div>
       </div>

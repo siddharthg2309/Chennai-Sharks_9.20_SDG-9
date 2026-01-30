@@ -106,7 +106,7 @@ function fallbackVerification(productName: string): VerificationResult {
 }
 
 function buildSystemPrompt(hasInvoice: boolean): string {
-  const basePrompt = `You are a green product verification assistant for GreenFin. Users can redeem their Green Credits when purchasing green/eco-friendly products.
+  const basePrompt = `You are a green product verification assistant for GreeFin. Users can redeem their Green Credits when purchasing green/eco-friendly products.
 
 Your job is to decide if a claim is eligible.
 
