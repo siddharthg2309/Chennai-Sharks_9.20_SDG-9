@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Building, Leaf, TrendingUp } from 'lucide-react';
+import { Building, Building2, Leaf } from 'lucide-react';
 
 import { Card } from '@/components/ui/Card';
 
@@ -21,8 +21,8 @@ const fundTypes = [
   {
     id: 'INVIT',
     name: 'InvITs',
-    icon: TrendingUp,
-    iconColor: 'text-purple-500',
+    icon: Building2,
+    iconColor: 'text-amber-500',
   },
 ];
 
