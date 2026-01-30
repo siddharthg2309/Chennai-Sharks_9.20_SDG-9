@@ -86,7 +86,7 @@ export default function InvestmentsPage() {
 
   return (
     <div className="p-4">
-      <div className="flex gap-6 mb-6 border-b border-gray-800">
+      <div className="flex justify-center gap-8 mb-6">
         {(['portfolio', 'sips', 'orders'] as const).map((tab) => (
           <button
             key={tab}
@@ -97,8 +97,8 @@ export default function InvestmentsPage() {
               setData([]);
               setActiveTab(tab);
             }}
-            className={`pb-3 font-medium capitalize ${
-              activeTab === tab ? 'text-white border-b-2 border-blue-500' : 'text-gray-500'
+            className={`pb-2 font-medium capitalize transition-colors ${
+              activeTab === tab ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-400'
             }`}
           >
             {tab === 'sips' ? 'SIPs' : tab}

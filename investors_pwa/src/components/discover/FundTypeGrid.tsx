@@ -35,7 +35,7 @@ export function FundTypeGrid() {
       <div className="space-y-3 mt-4">
         {fundTypes.map(({ id, name, icon: Icon, color }) => (
           <Link key={id} href={`/discover?type=${id}`}>
-            <Card className="flex items-center gap-4 hover:bg-gray-800 transition-colors">
+            <Card className="flex items-center gap-4 hover:bg-neutral-800 transition-colors">
               <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center`}>
                 <Icon className="w-6 h-6 text-white" />
               </div>
@@ -47,4 +47,3 @@ export function FundTypeGrid() {
     </div>
   );
 }
-

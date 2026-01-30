@@ -17,8 +17,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'disabled:opacity-50 disabled:pointer-events-none',
           {
             'bg-blue-600 text-white hover:bg-blue-700': variant === 'primary',
-            'bg-gray-800 text-white hover:bg-gray-700': variant === 'secondary',
-            'bg-transparent hover:bg-gray-800': variant === 'ghost',
+            'bg-neutral-800 text-white hover:bg-neutral-700': variant === 'secondary',
+            'bg-transparent hover:bg-neutral-800': variant === 'ghost',
           },
           {
             'h-8 px-3 text-sm': size === 'sm',
@@ -33,4 +33,3 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = 'Button';
-

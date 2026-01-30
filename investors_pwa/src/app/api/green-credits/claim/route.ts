@@ -5,6 +5,7 @@ import { greenCreditClaims, users } from '@/db/schema';
 import { db } from '@/lib/db';
 import { getCurrentUserId } from '@/lib/mock-user';
 import { verifyGreenProduct } from '@/lib/ai-agent';
+import { extractTextFromFile } from '@/lib/ocr';
 
 export async function POST(request: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
     if (!productName || !Number.isFinite(productPrice) || productPrice <= 0) {
       return NextResponse.json(
-        { success: false, error: 'Product name and price required' },
+        { success: false, error: 'Product name and valid price are required' },
         { status: 400 }
       );
     }
@@ -42,13 +43,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'No green credits available' }, { status: 400 });
     }
 
+    let invoiceText: string | undefined;
+    if (file && file.size > 0) {
+      try {
+        invoiceText = await extractTextFromFile(file);
+      } catch (ocrError) {
+        console.error('OCR extraction failed:', ocrError);
+      }
+    }
+
     const [claim] = await db
       .insert(greenCreditClaims)
       .values({
         userId,
         productName,
         productPrice: productPrice.toString(),
-        uploadedFileUrl: file ? 'uploaded' : null,
+        uploadedFileUrl: file ? `uploaded:${file.name}` : null,
         status: 'PENDING',
       })
       .returning();
@@ -56,12 +66,14 @@ export async function POST(request: Request) {
     let verificationResult;
     let isApproved = false;
     let creditsToRedeem = 0;
+    let verificationMethod: 'ai' | 'fallback' = process.env.OPENROUTER_API_KEY ? 'ai' : 'fallback';
 
     try {
       verificationResult = await verifyGreenProduct({
         productName,
         productPrice,
         userCredits: currentCredits,
+        invoiceText,
       });
 
       isApproved = verificationResult.isGreenProduct;
@@ -73,17 +85,24 @@ export async function POST(request: Request) {
 
       isApproved = true;
       creditsToRedeem = currentCredits;
+      verificationMethod = 'fallback';
       verificationResult = {
         isGreenProduct: true,
         reason: 'AI verification unavailable - auto-approved',
         productCategory: 'Unknown',
+        confidence: 'low' as const,
       };
     }
 
     await db
       .update(greenCreditClaims)
       .set({
-        aiVerificationResult: JSON.stringify(verificationResult),
+        aiVerificationResult: JSON.stringify({
+          ...verificationResult,
+          verificationMethod,
+          invoiceProvided: Boolean(invoiceText && invoiceText.trim().length > 0),
+          invoiceTextLength: invoiceText?.length || 0,
+        }),
         isApproved,
         creditsRedeemed: creditsToRedeem.toString(),
         status: isApproved ? 'APPROVED' : 'REJECTED',
@@ -110,9 +129,15 @@ export async function POST(request: Request) {
         isApproved,
         creditsRedeemed: creditsToRedeem,
         newBalance: isApproved ? currentCredits - creditsToRedeem : currentCredits,
-        verificationResult,
+        verificationResult: {
+          ...verificationResult,
+          method: verificationMethod,
+          invoiceProcessed: Boolean(invoiceText && invoiceText.trim().length > 0),
+        },
         message: isApproved
-          ? `Claim approved! ₹${creditsToRedeem.toFixed(2)} credited to your account.`
+          ? verificationMethod === 'fallback'
+            ? `Claim approved (auto-approved). ₹${creditsToRedeem.toFixed(2)} credited to your account.`
+            : `Claim approved! ₹${creditsToRedeem.toFixed(2)} credited to your account for your ${verificationResult.productCategory || 'green product'} purchase.`
           : `Claim rejected: ${verificationResult?.reason || 'Product not eligible for green credits'}`,
       },
     });
@@ -121,4 +146,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Failed to process claim' }, { status: 500 });
   }
 }
-

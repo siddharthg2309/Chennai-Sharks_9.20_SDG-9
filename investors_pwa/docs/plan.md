@@ -23,6 +23,7 @@ GreenFin is a PWA enabling retail investors to invest in green infrastructure (G
 | Phase 2 | Home & Discover Pages | [phase2.md](./phase2.md) |
 | Phase 3 | Investments, Orders, SIPs, Watchlist | [phase3.md](./phase3.md) |
 | Phase 4 | Account, Green Credits, AI Agent | [phase4.md](./phase4.md) |
+| Phase 5 | Bug Fixes, OCR Invoice, Enhanced AI | [phase5.md](./phase5.md) |
 
 ---
 
@@ -141,7 +142,8 @@ investors_pwa/
 │   └── lib/
 │       ├── db.ts
 │       ├── mock-user.ts
-│       └── ai-agent.ts
+│       ├── ai-agent.ts
+│       └── ocr.ts                      # PDF/Image text extraction
 ├── public/
 │   ├── manifest.json
 │   └── icons/
@@ -164,6 +166,8 @@ investors_pwa/
 | SIP Flow | `docs/images/image copy 12.png` |
 | Filters | `docs/images/image copy 10.png` |
 | Account | `docs/images/WhatsApp Image 2026-01-30 at 1.52.10 PM.jpeg` |
+| Carousel Issue | `docs/images/image copy 14.png` |
+| Claim Credits | `docs/images/image copy 15.png` |
 
 ---
 
@@ -208,3 +212,4 @@ On order creation:
 - **[Phase 2: Home & Discover](./phase2.md)** - Core pages, fund listing, search
 - **[Phase 3: Transactions](./phase3.md)** - Orders, SIPs, watchlist, portfolio
 - **[Phase 4: Green Credits](./phase4.md)** - Account, AI verification, PWA
+- **[Phase 5: Bug Fixes & OCR](./phase5.md)** - Carousel fix, OCR invoice extraction, enhanced AI verification

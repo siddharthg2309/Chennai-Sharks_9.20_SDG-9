@@ -103,7 +103,7 @@ export function PriceChart({ priceHistory }: { priceHistory: PriceHistory }) {
               onClick={() => setPeriod(p)}
               className={cn(
                 'px-3 py-1 rounded-full text-sm border',
-                p === period ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-700 text-gray-300'
+                p === period ? 'bg-blue-600 border-blue-600 text-white' : 'border-neutral-700 text-gray-300'
               )}
             >
               {p}

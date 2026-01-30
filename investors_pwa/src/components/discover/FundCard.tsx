@@ -16,7 +16,7 @@ export function FundCard({ fund }: FundCardProps) {
 
   return (
     <Link href={`/discover/fund/${fund.id}`}>
-      <Card className="hover:bg-gray-800 transition-colors">
+      <Card className="hover:bg-neutral-800 transition-colors">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex-shrink-0" />
 
@@ -35,7 +35,7 @@ export function FundCard({ fund }: FundCardProps) {
           </div>
         </div>
 
-        <div className="flex justify-between mt-3 pt-3 border-t border-gray-800">
+        <div className="flex justify-between mt-3 pt-3 border-t border-neutral-800">
           <div>
             <p className="text-xs text-gray-500">NAV</p>
             <p className="text-sm">{formatCurrency(fund.nav)}</p>
@@ -49,4 +49,3 @@ export function FundCard({ fund }: FundCardProps) {
     </Link>
   );
 }
-

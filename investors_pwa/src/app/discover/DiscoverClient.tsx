@@ -113,7 +113,7 @@ export function DiscoverClient() {
 
       {filterOpen && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
-          <div className="bg-gray-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-neutral-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Filters</h2>
               <button type="button" onClick={() => setFilterOpen(false)} className="p-2" aria-label="Close filters">
@@ -132,7 +132,7 @@ export function DiscoverClient() {
                     className={`px-3 py-2 rounded-full border text-sm ${
                       maxMinInvestment === value
                         ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'border-gray-700 text-gray-200'
+                        : 'border-neutral-700 text-gray-200'
                     }`}
                   >
                     ₹{value.toLocaleString('en-IN')}
@@ -142,7 +142,9 @@ export function DiscoverClient() {
                   type="button"
                   onClick={() => setMaxMinInvestment(null)}
                   className={`px-3 py-2 rounded-full border text-sm ${
-                    maxMinInvestment === null ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-700 text-gray-200'
+                    maxMinInvestment === null
+                      ? 'bg-blue-600 border-blue-600 text-white'
+                      : 'border-neutral-700 text-gray-200'
                   }`}
                 >
                   Any

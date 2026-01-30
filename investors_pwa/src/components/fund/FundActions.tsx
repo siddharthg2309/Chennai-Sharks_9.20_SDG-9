@@ -34,7 +34,7 @@ export function FundActions({ fund }: { fund: FundLike }) {
 
       {toast && (
         <div className="fixed bottom-36 left-0 right-0 px-4 z-40">
-          <div className="max-w-md mx-auto bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-gray-200">
+          <div className="max-w-md mx-auto bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-sm text-gray-200">
             {toast}
           </div>
         </div>

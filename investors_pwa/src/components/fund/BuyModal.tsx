@@ -68,7 +68,7 @@ export function BuyModal({ fund, onClose, onSuccess }: BuyModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
-      <div className="bg-gray-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
+      <div className="bg-neutral-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Buy</h2>
           <button type="button" onClick={onClose} className="p-2" aria-label="Close">
@@ -107,7 +107,7 @@ export function BuyModal({ fund, onClose, onSuccess }: BuyModalProps) {
           <p className="text-xs text-gray-500 mt-1">Min. {formatCurrency(minInvestment)} (multiple of ₹1)</p>
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-4 mb-4">
+        <div className="bg-neutral-800 rounded-lg p-4 mb-4">
           <p className="text-sm text-gray-500">Place order at NAV</p>
           <p className="text-lg">₹ {nav.toFixed(4)}</p>
           <p className="text-xs text-gray-500">Current NAV: ₹{nav.toFixed(4)}</p>

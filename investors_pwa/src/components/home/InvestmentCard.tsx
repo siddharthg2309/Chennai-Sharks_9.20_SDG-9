@@ -18,9 +18,9 @@ export function InvestmentCard({ totalInvested, currentValue, pnl, pnlPercent, x
   const isPositive = pnl >= 0;
 
   return (
-    <Card className="bg-gray-900">
+    <Card>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded-full">Your investments</span>
+        <span className="text-sm text-gray-400 bg-neutral-800 px-3 py-1 rounded-full">Your investments</span>
         <Link href="/investments" className="text-blue-500 text-sm flex items-center gap-1">
           View <RefreshCw className="w-3 h-3" />
         </Link>
@@ -38,7 +38,7 @@ export function InvestmentCard({ totalInvested, currentValue, pnl, pnlPercent, x
         </div>
       </div>
 
-      <div className="flex justify-between border-t border-gray-800 pt-4">
+      <div className="flex justify-between border-t border-neutral-800 pt-4">
         <div>
           <p className="text-xs text-gray-500">Invested</p>
           <p className="text-lg">{formatCurrency(totalInvested)}</p>
@@ -51,4 +51,3 @@ export function InvestmentCard({ totalInvested, currentValue, pnl, pnlPercent, x
     </Card>
   );
 }
-

@@ -68,7 +68,7 @@ export function SipModal({ fund, onClose, onSuccess }: SipModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
-      <div className="bg-gray-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
+      <div className="bg-neutral-900 w-full rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Create SIP</h2>
           <button type="button" onClick={onClose} className="p-2" aria-label="Close">
@@ -108,7 +108,7 @@ export function SipModal({ fund, onClose, onSuccess }: SipModalProps) {
             <select
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as 'WEEKLY' | 'MONTHLY')}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 flex-1"
+              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 flex-1"
             >
               <option value="WEEKLY">Weekly</option>
               <option value="MONTHLY">Monthly</option>
@@ -121,7 +121,7 @@ export function SipModal({ fund, onClose, onSuccess }: SipModalProps) {
           <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} min={new Date().toISOString().split('T')[0]} />
         </div>
 
-        <div className="bg-gray-800 rounded-lg p-4 mb-4">
+        <div className="bg-neutral-800 rounded-lg p-4 mb-4">
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-500">Amount per installment</span>
             <span>{formatCurrency(installmentAmount)}</span>

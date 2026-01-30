@@ -34,11 +34,15 @@ export function SearchBar({ defaultValue = '', onFilterClick }: SearchBarProps) 
         />
       </div>
       {onFilterClick && (
-        <button type="button" onClick={onFilterClick} className="p-2 bg-gray-800 rounded-lg" aria-label="Filters">
+        <button
+          type="button"
+          onClick={onFilterClick}
+          className="p-2 bg-neutral-800 rounded-lg"
+          aria-label="Filters"
+        >
           <SlidersHorizontal className="w-5 h-5" />
         </button>
       )}
     </form>
   );
 }
-

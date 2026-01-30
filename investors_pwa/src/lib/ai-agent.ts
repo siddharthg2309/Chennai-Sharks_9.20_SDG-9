@@ -7,30 +7,41 @@ interface VerificationInput {
   productName: string;
   productPrice: number;
   userCredits: number;
+  invoiceText?: string;
 }
 
 export interface VerificationResult {
   isGreenProduct: boolean;
   reason: string;
   productCategory: string;
-  estimatedPrice?: number;
+  confidence: 'high' | 'medium' | 'low';
+  extractedDetails?: {
+    detectedProductName?: string;
+    detectedPrice?: number;
+    sellerName?: string;
+    invoiceDate?: string;
+  };
 }
 
 const GREEN_CATEGORIES = [
   'solar panel',
   'solar water heater',
   'solar inverter',
+  'solar battery',
   'electric vehicle',
   'ev',
   'e-bike',
   'electric scooter',
   'electric car',
+  'electric motorcycle',
   'battery storage',
   'home battery',
+  'powerwall',
   'wind turbine',
   'energy efficient appliance',
   '5-star',
   'led lights',
+  'led bulb',
   'smart thermostat',
   'insulation',
   'heat pump',
@@ -40,6 +51,9 @@ const GREEN_CATEGORIES = [
   'e-bicycle',
   'public transport pass',
   'metro card',
+  'bus pass',
+  'ev charger',
+  'charging station',
 ];
 
 let cachedLlm: ChatOpenAI | null | undefined;
@@ -59,66 +73,150 @@ function getLlm() {
       baseURL: 'https://openrouter.ai/api/v1',
     },
     temperature: 0,
+    maxTokens: 500,
   });
 
   return cachedLlm;
 }
 
-function keywordFallback(productName: string): VerificationResult {
+function capitalizeWords(str: string): string {
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+function fallbackVerification(productName: string): VerificationResult {
   const productLower = productName.toLowerCase();
-  const isGreen = GREEN_CATEGORIES.some((cat) => productLower.includes(cat.toLowerCase()));
+  const matchedCategory = GREEN_CATEGORIES.find((cat) => productLower.includes(cat.toLowerCase()));
+
+  if (matchedCategory) {
+    return {
+      isGreenProduct: true,
+      reason: `Product matches green category: "${matchedCategory}"`,
+      productCategory: capitalizeWords(matchedCategory),
+      confidence: 'medium',
+    };
+  }
+
+  const greenKeywords = ['solar', 'electric', 'ev', 'renewable', 'eco', 'green', 'sustainable'];
+  const hasGreenKeyword = greenKeywords.some((kw) => productLower.includes(kw));
+
+  if (hasGreenKeyword) {
+    return {
+      isGreenProduct: true,
+      reason: 'Product name contains green/eco-friendly keywords',
+      productCategory: 'Green Product',
+      confidence: 'low',
+    };
+  }
+
   return {
-    isGreenProduct: isGreen,
-    reason: isGreen
-      ? 'Product matches green category keywords'
-      : 'Product does not match any green category',
-    productCategory: isGreen ? 'Green Product' : 'Not Eligible',
+    isGreenProduct: false,
+    reason: 'Product does not match any green/renewable category',
+    productCategory: 'Not Eligible',
+    confidence: 'medium',
   };
 }
 
+function buildSystemPrompt(hasInvoice: boolean): string {
+  const basePrompt = `You are a green product verification assistant for GreenFin. Users can redeem their Green Credits when purchasing green/eco-friendly products.
+
+Your job is to decide if a claim is eligible.
+
+ELIGIBLE:
+- Solar: panels, water heaters, inverters, batteries, rooftop systems
+- Electric Vehicles: cars, e-bikes, e-scooters, chargers
+- Energy Storage: home batteries, storage systems
+- Energy Efficient: 5-star rated appliances, LED systems
+- Heating/Cooling: heat pumps, smart thermostats
+- Water: rainwater harvesting
+- Mobility: bicycles, public transport passes
+
+NOT ELIGIBLE:
+- Petrol/diesel vehicles
+- Phones/laptops/TVs and general electronics
+- Clothing, furniture, food
+- Anything clearly unrelated to sustainability
+
+Rules:
+1) Product must be renewable/sustainable
+2) If ambiguous, lean towards rejection
+3) If price looks suspicious (e.g. solar panel for ₹500), flag it`;
+
+  const invoiceInstructions = hasInvoice
+    ? `
+
+INVOICE (OCR text provided):
+- Cross-check product name & amount against invoice text
+- Extract seller name and invoice date if visible
+- If invoice text is unclear, rely more on the stated product name`
+    : `
+
+NO INVOICE:
+- Verify only using the product name + claimed price
+- Be slightly more cautious without invoice proof`;
+
+  return (
+    basePrompt +
+    invoiceInstructions +
+    `
+
+Respond ONLY in JSON:
+{
+  "isGreenProduct": boolean,
+  "reason": "Clear explanation",
+  "productCategory": "Category name or 'Not Eligible'",
+  "confidence": "high" | "medium" | "low",
+  "extractedDetails": {
+    "detectedProductName": "string (if applicable)",
+    "detectedPrice": number (if applicable),
+    "sellerName": "string (if applicable)",
+    "invoiceDate": "string (if applicable)"
+  }
+}`
+  );
+}
+
+function buildUserPrompt(input: VerificationInput): string {
+  const { productName, productPrice, userCredits, invoiceText } = input;
+
+  let prompt = `Please verify this green credit redemption claim:
+
+CLAIM DETAILS
+- Product Name: ${productName}
+- Claimed Price: ₹${productPrice.toLocaleString('en-IN')}
+- User Credits Available: ₹${userCredits.toLocaleString('en-IN')}`;
+
+  if (invoiceText && invoiceText.trim().length > 0) {
+    const truncatedText = invoiceText.length > 2000 ? `${invoiceText.slice(0, 2000)}... [truncated]` : invoiceText;
+    prompt += `
+
+INVOICE TEXT (OCR)
+\`\`\`
+${truncatedText}
+\`\`\``;
+  } else {
+    prompt += `
+
+NOTE: No invoice uploaded.`;
+  }
+
+  prompt += `
+
+Is this eligible? Respond with JSON only.`;
+  return prompt;
+}
+
 export async function verifyGreenProduct(input: VerificationInput): Promise<VerificationResult> {
-  const { productName, productPrice, userCredits } = input;
   const llm = getLlm();
 
   if (!llm) {
-    return keywordFallback(productName);
+    return fallbackVerification(input.productName);
   }
 
-  const systemPrompt = `You are a green product verification assistant for GreenFin.
-Your job is to determine if a product qualifies for green credit redemption.
-
-ELIGIBLE PRODUCTS (renewable energy or eco-friendly):
-- Solar panels, solar water heaters, solar inverters
-- Electric vehicles (EVs), e-bikes, electric scooters
-- Home batteries, energy storage systems
-- Energy efficient appliances (5-star rated)
-- LED lighting systems
-- Heat pumps, smart thermostats
-- Rainwater harvesting systems
-- Bicycles, public transport passes
-
-NOT ELIGIBLE:
-- Regular vehicles (petrol/diesel)
-- Standard home appliances
-- Electronics (phones, laptops, TVs)
-- Clothing, furniture, food
-- Any non-environmental products
-
-Respond in JSON format:
-{
-  "isGreenProduct": boolean,
-  "reason": "Brief explanation",
-  "productCategory": "Category name or 'Not Eligible'",
-  "estimatedPrice": number (estimated market price in INR)
-}`;
-
-  const userPrompt = `Verify this product for green credit redemption:
-
-Product Name: ${productName}
-Claimed Price: ₹${productPrice}
-User's Available Credits: ₹${userCredits}
-
-Is this a valid green/renewable energy product? Respond with JSON only.`;
+  const systemPrompt = buildSystemPrompt(Boolean(input.invoiceText));
+  const userPrompt = buildUserPrompt(input);
 
   try {
     const response = await llm.invoke([new SystemMessage(systemPrompt), new HumanMessage(userPrompt)]);
@@ -130,18 +228,18 @@ Is this a valid green/renewable energy product? Respond with JSON only.`;
     }
 
     const result = JSON.parse(jsonMatch[0]) as VerificationResult;
-    const productLower = productName.toLowerCase();
+    const productLower = input.productName.toLowerCase();
     const hasGreenKeyword = GREEN_CATEGORIES.some((cat) => productLower.includes(cat.toLowerCase()));
 
     if (!result.isGreenProduct && hasGreenKeyword) {
       result.isGreenProduct = true;
-      result.reason = `Product contains green keyword: ${productName}`;
+      result.reason = `Product "${input.productName}" matches green category`;
+      result.confidence = 'medium';
     }
 
     return result;
   } catch (error) {
     console.error('AI verification error:', error);
-    return keywordFallback(productName);
+    return fallbackVerification(input.productName);
   }
 }
-
