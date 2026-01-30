@@ -10,19 +10,19 @@ const fundTypes = [
     id: 'GREEN_FUND',
     name: 'Green Funds',
     icon: Leaf,
-    color: 'bg-green-500',
+    iconColor: 'text-green-500',
   },
   {
     id: 'GREEN_BOND',
     name: 'Green Bonds',
     icon: Building,
-    color: 'bg-blue-500',
+    iconColor: 'text-blue-500',
   },
   {
     id: 'INVIT',
     name: 'InvITs',
     icon: TrendingUp,
-    color: 'bg-purple-500',
+    iconColor: 'text-purple-500',
   },
 ];
 
@@ -33,11 +33,11 @@ export function FundTypeGrid() {
       <p className="text-base">Find the right fund across these categories</p>
 
       <div className="space-y-3 mt-4">
-        {fundTypes.map(({ id, name, icon: Icon, color }) => (
+        {fundTypes.map(({ id, name, icon: Icon, iconColor }) => (
           <Link key={id} href={`/discover?type=${id}`}>
             <Card className="flex items-center gap-4 hover:bg-neutral-800 transition-colors">
-              <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center`}>
-                <Icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 flex items-center justify-center">
+                <Icon className={`w-6 h-6 ${iconColor}`} />
               </div>
               <span className="font-medium">{name}</span>
             </Card>

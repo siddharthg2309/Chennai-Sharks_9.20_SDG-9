@@ -10,7 +10,6 @@ const categories = [
     title: 'Green Mutual Funds',
     description: 'ESG & renewable energy funds',
     icon: Leaf,
-    iconBg: 'bg-green-500/20',
     iconColor: 'text-green-500',
   },
   {
@@ -18,7 +17,6 @@ const categories = [
     title: 'Green Bonds',
     description: 'Fixed return green bonds',
     icon: Building,
-    iconBg: 'bg-blue-500/20',
     iconColor: 'text-blue-500',
   },
   {
@@ -26,7 +24,6 @@ const categories = [
     title: 'Green InvITs',
     description: 'Infrastructure trusts',
     icon: TrendingUp,
-    iconBg: 'bg-purple-500/20',
     iconColor: 'text-purple-500',
   },
 ];
@@ -73,7 +70,7 @@ export function ExploreCarousel() {
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {categories.map(({ id, title, description, icon: Icon, iconBg, iconColor }) => (
+        {categories.map(({ id, title, description, icon: Icon, iconColor }) => (
           <Link
             key={id}
             href={`/discover?type=${id}`}
@@ -81,8 +78,8 @@ export function ExploreCarousel() {
             style={{ width: '70%' }}
           >
             <div className="bg-neutral-900 rounded-xl p-4 h-40 flex flex-col justify-between hover:bg-neutral-800 transition-colors">
-              <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
-                <Icon className={`w-6 h-6 ${iconColor}`} />
+              <div className="w-12 h-12 flex items-center">
+                <Icon className={`w-7 h-7 ${iconColor}`} />
               </div>
               <div>
                 <h3 className="font-semibold text-base mb-1">{title}</h3>
