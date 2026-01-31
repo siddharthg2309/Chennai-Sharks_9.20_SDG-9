@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   ArrowLeft,
+  Banknote,
   CheckCircle,
   FileText,
-  Leaf,
   Loader2,
   Upload,
   XCircle,
@@ -165,7 +165,7 @@ export default function ClaimCreditsPage() {
       <Card className="mb-6 bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-800">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
-            <Leaf className="w-6 h-6 text-green-500" />
+            <Banknote className="w-6 h-6 text-green-500" />
           </div>
           <div>
             <p className="text-sm text-gray-400">Available Balance</p>
@@ -234,9 +234,8 @@ export default function ClaimCreditsPage() {
           <div>
             <label className="text-sm text-gray-400 block mb-2">Upload Invoice (PDF only)</label>
             <label
-              className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors ${
-                file ? 'border-green-600 bg-green-900/20' : 'border-neutral-700 hover:border-neutral-600'
-              } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors ${file ? 'border-green-600 bg-green-900/20' : 'border-neutral-700 hover:border-neutral-600'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <FileIcon className={`w-8 h-8 ${file ? 'text-green-500' : 'text-gray-500'}`} />
               <span className={`text-sm ${file ? 'text-green-400' : 'text-gray-500'}`}>
@@ -301,9 +300,8 @@ function ResultCard({ result, onReset }: { result: ClaimResult; onReset: () => v
 
   return (
     <Card
-      className={`text-center py-8 border ${
-        isApproved ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800'
-      }`}
+      className={`text-center py-8 border ${isApproved ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800'
+        }`}
     >
       {isApproved ? (
         <>
